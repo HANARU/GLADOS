@@ -6,12 +6,12 @@
 #include "GameFramework/GameModeBase.h"
 #include "GLADOSGameModeBase.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class GLADOS_API AGLADOSGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	AGLADOSGameModeBase();
 	
 };
