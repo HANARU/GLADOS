@@ -63,8 +63,9 @@ AActor* APortalWall::TryAddPortal(FVector PortalOrigin, bool PortalA)
 	{
 		FVector SpawnLocation = UKismetMathLibrary::TransformLocation(GetActorTransform(), RelativePortalOrigin);
 		FRotator SpawnRotation = GetActorRotation();
+		
 
-		GetWorld()->SpawnActor()
+		
 	}
 
 	return nullptr;
@@ -106,4 +107,3 @@ bool APortalWall::RectToRectCollision(FVector2D Rect1Origin, FVector2D Rect1Exte
 	else { CollsionCheck = true; }
 	return CollsionCheck;
 }
-

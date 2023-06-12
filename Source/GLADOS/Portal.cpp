@@ -4,7 +4,6 @@
 
 APortal::APortal()
 {
-	PortalMesh = CreateDefaultSubobject<
 
 }
 
