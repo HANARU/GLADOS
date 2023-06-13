@@ -51,6 +51,8 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 
+	// void Interaction(const FInputActionValue& Value);
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 

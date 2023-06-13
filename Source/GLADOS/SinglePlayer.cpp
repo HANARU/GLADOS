@@ -2,6 +2,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Engine/World.h"
 #include "Components/CapsuleComponent.h"
 
 ASinglePlayer::ASinglePlayer()
@@ -53,6 +54,8 @@ void ASinglePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASinglePlayer::Look);	
 
+	// EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &ASinglePlayer::Interaction);
+
 }
 
 void ASinglePlayer::Move(const FInputActionValue& Value)
@@ -78,6 +81,20 @@ void ASinglePlayer::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+/*void ASinglePlayer::Interaction(const FInputActionValue& Value)
+{
+	bool Interact = Value.Get<bool>();
+
+	if (Controller != nullptr)
+	{
+		FHitResult HitResult;
+
+		FVector Start = CameraComponent->GetWorldLocation();
+		FVector End((GetForwaordVector * MaxInteractDistance) + GetWorldLocation.FistPersonCamera);
+		ECollisionChannel 
+	}
+}*/
 
 void ASinglePlayer::Tick(float DeltaTime)
 {
