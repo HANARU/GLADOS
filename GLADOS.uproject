@@ -125,14 +125,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "WindowsMoviePlayer",
-			"Enabled": false
-		},
-		{
-			"Name": "WmfMedia",
-			"Enabled": false
-		},
-		{
 			"Name": "AppleImageUtils",
 			"Enabled": false
 		},
