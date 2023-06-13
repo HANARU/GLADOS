@@ -16,9 +16,9 @@ public:
 	APortalWall();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	float Wall_Width;
+	float Wall_Width = 500;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	float Wall_Height;
+	float Wall_Height = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneComponent* DefaultSceneRoot;
@@ -52,7 +52,8 @@ public:
 
 	bool RectToRectCollision(FVector2D Rect1Origin, FVector2D Rect1Extents, FVector2D Rect2Origin, FVector2D Rect2Extents);
 
-
+private:
+	void SetWallMesh();
 
 
 };

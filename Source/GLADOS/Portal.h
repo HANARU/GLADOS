@@ -17,6 +17,9 @@ public:
 	APortal();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USceneComponent* DefaultSceneRoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* PortalBorderMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,5 +38,8 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+
+private:
+	void SetMeshes();
 
 };

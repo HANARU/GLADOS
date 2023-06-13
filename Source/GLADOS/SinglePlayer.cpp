@@ -1,15 +1,20 @@
 #include "SinglePlayer.h"
+#include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
-#include "Engine/World.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "Kismet/KismetStringLibrary.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 
 ASinglePlayer::ASinglePlayer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.f);
+	bIsGrabbing = false;
+
+	GetCapsuleComponent()->InitCapsuleSize(30.f, 80.f);
 	RootComponent = GetCapsuleComponent();
 
 	FPSCAM = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCAM"));
@@ -17,12 +22,18 @@ ASinglePlayer::ASinglePlayer()
 	FPSCAM->SetRelativeLocation(FVector(-10.f, 0.f, 60.f));
 	FPSCAM->bUsePawnControlRotation = true;
 
+	GrabPoint = CreateDefaultSubobject<USceneComponent>(TEXT("GrabPoint"));
+	GrabPoint->SetupAttachment(FPSCAM);
+	GrabPoint->SetRelativeLocation(FVector(130.f, 0.f, 0.f));
+
 	PlayerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
 	PlayerMesh->SetOnlyOwnerSee(true);
 	PlayerMesh->SetupAttachment(FPSCAM);
 	PlayerMesh->bCastDynamicShadow = false;
 	PlayerMesh->CastShadow = false;
 	PlayerMesh->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	PhysicsHandleComp = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
 
 }
 
@@ -54,7 +65,7 @@ void ASinglePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASinglePlayer::Look);	
 
-	// EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &ASinglePlayer::Interaction);
+	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &ASinglePlayer::Interaction);
 
 }
 
@@ -82,22 +93,53 @@ void ASinglePlayer::Look(const FInputActionValue& Value)
 	}
 }
 
-/*void ASinglePlayer::Interaction(const FInputActionValue& Value)
+void ASinglePlayer::Interaction()
 {
-	bool Interact = Value.Get<bool>();
+	FVector StartLocation;
+	FRotator Direction;
+	FHitResult HitResult;
+	FVector CompLocation;
 
-	if (Controller != nullptr)
+	StartLocation = FPSCAM->GetComponentLocation();
+	GetController()->GetPlayerViewPoint(StartLocation, Direction);
+	FVector EndLocation = StartLocation + (Direction.Vector() * 10000.f);
+
+	FCollisionQueryParams QueryParams;
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams);
+
+	//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 2.f);
+
+	if (bIsGrabbing == false)
 	{
-		FHitResult HitResult;
+		bIsGrabbing = !bIsGrabbing;
 
-		FVector Start = CameraComponent->GetWorldLocation();
-		FVector End((GetForwaordVector * MaxInteractDistance) + GetWorldLocation.FistPersonCamera);
-		ECollisionChannel 
+		GrabbableComp = HitResult.GetComponent();
+
+		CompLocation = GrabbableComp->GetComponentLocation();
+
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+			
+		PhysicsHandleComp->GrabComponentAtLocation(GrabbableComp, TEXT("None"), CompLocation);
 	}
-}*/
+
+	else if(IsValid(GrabbableComp))
+	{
+		PhysicsHandleComp->ReleaseComponent();
+		//GrabbableComp = nullptr;
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+		bIsGrabbing = !bIsGrabbing;
+	}
+
+}
 
 void ASinglePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (IsValid(GrabbableComp))
+	{
+		PhysicsHandleComp->SetTargetLocationAndRotation(GrabPoint->GetComponentLocation(),GetControlRotation());
+	}
 
 }

@@ -14,6 +14,8 @@ APortalWall::APortalWall()
 	WallMesh->SetupAttachment(DefaultSceneRoot);
 	WallMesh->SetWorldScale3D(FVector(1.0, Wall_Width / 100.f, Wall_Height / 100.f));
 
+	SetWallMesh();
+
 }
 
 void APortalWall::BeginPlay()
@@ -106,4 +108,13 @@ bool APortalWall::RectToRectCollision(FVector2D Rect1Origin, FVector2D Rect1Exte
 
 	else { CollsionCheck = true; }
 	return CollsionCheck;
+}
+
+void APortalWall::SetWallMesh()
+{
+	ConstructorHelpers::FObjectFinder<UStaticMesh> Mesh(TEXT("/Script/Engine.StaticMesh'/Game/3_Assets/PortalWall/SM_PortalWall.SM_PortalWall'"));
+	if (Mesh.Succeeded())
+	{
+		WallMesh->SetStaticMesh(Mesh.Object);
+	}
 }

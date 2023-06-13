@@ -24,6 +24,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FPSCAM;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Scene, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* GrabPoint;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* PlayerMappingContext;
 
@@ -42,6 +45,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractionAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Components, meta = (AllowPrivateAccess = "true"))
+	class UPrimitiveComponent* GrabbableComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics, meta = (AllowPrivateAccess = "true"))
+	class UPhysicsHandleComponent* PhysicsHandleComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics, meta = (AllowPrivateAccess = "true"))
+	bool bIsGrabbing;
+
+	bool bIsHit;
+
 	ASinglePlayer();
 
 protected:
@@ -51,7 +65,7 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 
-	// void Interaction(const FInputActionValue& Value);
+	void Interaction();
 
 public:	
 	virtual void Tick(float DeltaTime) override;
