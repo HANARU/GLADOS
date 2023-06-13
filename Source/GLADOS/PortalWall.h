@@ -32,6 +32,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> NeedSpawnActor;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UMaterialInterface* Material_Wall;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blueprint")
+	TSubclassOf<class APortal> Portal;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UMaterial* BaseMaterial;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UMaterialInstance* BaseMaterialInstance;
+
 	float PortalSizeY, PortalSizeZ;
 
 
@@ -52,8 +64,10 @@ public:
 
 	bool RectToRectCollision(FVector2D Rect1Origin, FVector2D Rect1Extents, FVector2D Rect2Origin, FVector2D Rect2Extents);
 
+
+
 private:
-	void SetWallMesh();
+	void SetConstructor();
 
 
 };

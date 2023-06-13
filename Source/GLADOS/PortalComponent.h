@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "PortalWall.h"
 #include "Engine/World.h"
+#include "InputActionValue.h"
 #include "Components/ActorComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "PortalComponent.generated.h"
@@ -19,14 +20,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaxSpawnDistance;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class ASinglePlayer* Player;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* PortalGunMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* MouseLeftclickAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* MouseRightclickAction;
+
 protected:
 	virtual void BeginPlay() override;
 
 public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent);
 
 public:
 	void SpawnPortalAlongVector(FVector StartLocation, FVector Direction, bool PortalA);
 
-		
+	void SpawnLeftBlue();
+	void SpawnRightOrange();
 };

@@ -38,6 +38,20 @@ void APortal::Tick(float DeltaTime)
 
 }
 
+void APortal::LinkPortals(APortal Portal)
+{
+	LinkedPortal = &Portal;
+	if (IsValid(LinkedPortal))
+	{
+		// 포탈 내 RenderTarget 추적
+	}
+
+	else
+	{
+		// 포탈 없는 Material 생성
+	}
+}
+
 void APortal::SetMeshes()
 {
 	ConstructorHelpers::FObjectFinder<UStaticMesh> BorderMesh(TEXT("/Script/Engine.StaticMesh'/Game/3_Assets/Portal/Mesh/SM_PortalBorder.SM_PortalBorder'"));

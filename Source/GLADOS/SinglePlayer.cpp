@@ -1,5 +1,6 @@
 #include "SinglePlayer.h"
 #include "Engine/World.h"
+#include "PortalComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
@@ -45,6 +46,7 @@ void ASinglePlayer::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
+			Subsystem->ClearAllMappings();
 			Subsystem->AddMappingContext(PlayerMappingContext, 0);
 		}
 	}

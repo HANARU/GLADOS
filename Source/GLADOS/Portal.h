@@ -31,6 +31,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneCaptureComponent2D* SceneCapture;
 
+	APortal* LinkedPortal;
 
 
 protected:
@@ -38,6 +39,8 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+
+	void LinkPortals(APortal Portal);
 
 private:
 	void SetMeshes();

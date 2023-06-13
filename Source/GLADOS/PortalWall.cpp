@@ -1,4 +1,5 @@
-#include "PortalWall.h"
+#include "PortalWall.h"	
+#include "Portal.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 
@@ -14,8 +15,10 @@ APortalWall::APortalWall()
 	WallMesh->SetupAttachment(DefaultSceneRoot);
 	WallMesh->SetWorldScale3D(FVector(1.0, Wall_Width / 100.f, Wall_Height / 100.f));
 
-	SetWallMesh();
+	Material_Wall = CreateDefaultSubobject<UMaterialInterface>("Material_Wall");
 
+	
+	SetConstructor();
 }
 
 void APortalWall::BeginPlay()
@@ -110,11 +113,17 @@ bool APortalWall::RectToRectCollision(FVector2D Rect1Origin, FVector2D Rect1Exte
 	return CollsionCheck;
 }
 
-void APortalWall::SetWallMesh()
+void APortalWall::SetConstructor()
 {
 	ConstructorHelpers::FObjectFinder<UStaticMesh> Mesh(TEXT("/Script/Engine.StaticMesh'/Game/3_Assets/PortalWall/SM_PortalWall.SM_PortalWall'"));
 	if (Mesh.Succeeded())
 	{
 		WallMesh->SetStaticMesh(Mesh.Object);
 	}
+
+	ConstructorHelpers::FClassFinder<APortal> TempPortal(TEXT("/Script/Engine.Blueprint'/Game/2_BP/BP_Portal.BP_Portal_C'"));
+	if (TempPortal.Succeeded()) { Portal->StaticClass(); }
+
+	ConstructorHelpers::FObjectFinder<UMaterialInterface> M_Wall(TEXT("/Script/Engine.Material'/Game/3_Assets/PortalWall/M_PortalWall.M_PortalWall'"));
+	if(M_Wall.Succeeded()) { WallMesh->SetMaterial(0, Material_Wall); }
 }

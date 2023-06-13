@@ -22,7 +22,7 @@ public:
 	USkeletalMeshComponent* PlayerMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FPSCAM;
+	class UCameraComponent* FPSCAM;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Scene, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* GrabPoint;
@@ -53,6 +53,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics, meta = (AllowPrivateAccess = "true"))
 	bool bIsGrabbing;
+
+	class UPortalComponent* PortalComponent;
 
 	bool bIsHit;
 

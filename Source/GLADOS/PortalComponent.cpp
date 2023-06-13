@@ -1,23 +1,39 @@
 #include "PortalComponent.h"
+#include "SinglePlayer.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
+
 
 UPortalComponent::UPortalComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
-
 	MaxSpawnDistance = 10000.f;
 }
 
 
 void UPortalComponent::BeginPlay()
 {
-	Super::BeginPlay();
+	if (APlayerController* PlayerController = Cast<APlayerController>(Player->GetController()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(PortalGunMappingContext, 0);
+		}
+	}
+
+	Player = Cast<ASinglePlayer>(GetOwner());
+
+	
 
 }
 
-
-void UPortalComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UPortalComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+
+	EnhancedInputComponent->BindAction(MouseLeftclickAction, ETriggerEvent::Triggered, this, &UPortalComponent::SpawnLeftBlue);
+	EnhancedInputComponent->BindAction(MouseRightclickAction, ETriggerEvent::Triggered, this, &UPortalComponent::SpawnRightOrange);
+
 
 }
 
@@ -39,5 +55,21 @@ void UPortalComponent::SpawnPortalAlongVector(FVector StartLocation, FVector Dir
 		}
 		
 	}
+}
+
+void UPortalComponent::SpawnLeftBlue()
+{
+	UCameraComponent* Cam = Player->FPSCAM;
+	FVector StartLocation = Cam->GetComponentLocation();
+	FVector Direction = Cam->GetForwardVector();
+	Player->PortalComponent->SpawnPortalAlongVector(StartLocation, Direction, true);
+}
+
+void UPortalComponent::SpawnRightOrange()
+{
+	UCameraComponent* Cam = Player->FPSCAM;
+	FVector StartLocation = Cam->GetComponentLocation();
+	FVector Direction = Cam->GetForwardVector();
+	Player->PortalComponent->SpawnPortalAlongVector(StartLocation, Direction, false);
 }
 
