@@ -35,6 +35,7 @@ ASinglePlayer::ASinglePlayer()
 	PlayerMesh->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	PhysicsHandleComp = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
+	//PortalComponent = CreateDefaultSubobject<UPortalComponent>(TEXT("PortalComponent"));
 
 }
 
@@ -42,7 +43,7 @@ void ASinglePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
@@ -59,7 +60,6 @@ void ASinglePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	//auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
@@ -69,6 +69,14 @@ void ASinglePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &ASinglePlayer::Interaction);
 
+}
+
+void ASinglePlayer::PickupGunPure()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Overlap from Player"));
+	bDestroyedPortalComponent = true;
+	FString BoolCheck = UKismetStringLibrary::Conv_BoolToString(bDestroyedPortalComponent);
+	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, BoolCheck);
 }
 
 void ASinglePlayer::Move(const FInputActionValue& Value)

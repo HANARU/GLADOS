@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "EventInterface.h"
 #include "SinglePlayer.generated.h"
 
 class UInputComponent;
@@ -13,7 +14,7 @@ class UAnimMontage;
 class USoundBase;
 
 UCLASS(config = Game)
-class GLADOS_API ASinglePlayer : public ACharacter
+class GLADOS_API ASinglePlayer : public ACharacter, public IEventInterface
 {
 	GENERATED_BODY()
 
@@ -54,9 +55,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics, meta = (AllowPrivateAccess = "true"))
 	bool bIsGrabbing;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Portal, meta = (AllowPrivateAccess = "true"))
 	class UPortalComponent* PortalComponent;
 
 	bool bIsHit;
+	bool bDestroyedPortalComponent = false;
 
 	ASinglePlayer();
 
@@ -73,5 +76,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void PickupGunPure() override;
 
 };

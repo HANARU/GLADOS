@@ -59,6 +59,7 @@ void UPortalComponent::SpawnPortalAlongVector(FVector StartLocation, FVector Dir
 
 void UPortalComponent::SpawnLeftBlue()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Blue Portal Spawn!"));
 	UCameraComponent* Cam = Player->FPSCAM;
 	FVector StartLocation = Cam->GetComponentLocation();
 	FVector Direction = Cam->GetForwardVector();
@@ -67,6 +68,7 @@ void UPortalComponent::SpawnLeftBlue()
 
 void UPortalComponent::SpawnRightOrange()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Orange, TEXT("Orange Portal Spawn!"));
 	UCameraComponent* Cam = Player->FPSCAM;
 	FVector StartLocation = Cam->GetComponentLocation();
 	FVector Direction = Cam->GetForwardVector();
