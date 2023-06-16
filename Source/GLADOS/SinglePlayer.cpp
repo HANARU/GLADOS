@@ -73,8 +73,8 @@ void ASinglePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ASinglePlayer::Crouching);
 
-	EnhancedInputComponent->BindAction(MouseLeftclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnLeftBlue);
-	EnhancedInputComponent->BindAction(MouseRightclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnRightOrange);
+	//EnhancedInputComponent->BindAction(MouseLeftclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnLeftBlue);
+	//EnhancedInputComponent->BindAction(MouseRightclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnRightOrange);
 
 }
 
@@ -134,7 +134,6 @@ void ASinglePlayer::PickupGunPure()
 void ASinglePlayer::Interaction()
 {
 	FVector StartLocation;
-	FRotator Direction;
 	FHitResult HitResult;
 	FVector CompLocation;
 
@@ -143,29 +142,33 @@ void ASinglePlayer::Interaction()
 	FVector EndLocation = StartLocation + (Direction.Vector() * 10000.f);
 
 	FCollisionQueryParams QueryParams;
-
+	
 	GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams);
 
 	//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 2.f);
 
-	if (bIsGrabbing == false)
+	GrabbableComp = HitResult.GetComponent();
+	bool PhysicsCheck = GrabbableComp->IsAnySimulatingPhysics();
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_BoolToString(PhysicsCheck));
+
+	if (bIsGrabbing == false && PhysicsCheck == true)
 	{
 		bIsGrabbing = !bIsGrabbing;
 
-		GrabbableComp = HitResult.GetComponent();
-
 		CompLocation = GrabbableComp->GetComponentLocation();
+		FString CompLocationString = UKismetStringLibrary::Conv_VectorToString(CompLocation);
 
-		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
-			
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+
 		PhysicsHandleComp->GrabComponentAtLocation(GrabbableComp, TEXT("None"), CompLocation);
+		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, CompLocationString);
+
 	}
 
-	else if(IsValid(GrabbableComp))
+	else if (IsValid(GrabbableComp))
 	{
 		PhysicsHandleComp->ReleaseComponent();
-		//GrabbableComp = nullptr;
-		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
 		bIsGrabbing = !bIsGrabbing;
 	}
 
@@ -177,52 +180,83 @@ void ASinglePlayer::Tick(float DeltaTime)
 
 	if (IsValid(GrabbableComp))
 	{
-		PhysicsHandleComp->SetTargetLocationAndRotation(GrabPoint->GetComponentLocation(),GetControlRotation());
+		GEngine->AddOnScreenDebugMessage(-1, 0.002, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+		PhysicsHandleComp->SetTargetLocationAndRotation(GrabPoint->GetComponentLocation(), Direction);
 	}
 
 }
+
+
+
+
+
+
+/*if (bIsGrabbing == false)
+{
+	bIsGrabbing = !bIsGrabbing;
+
+	GrabbableComp = HitResult.GetComponent();
+
+	CompLocation = GrabbableComp->GetComponentLocation();
+	FString CompLocationString = UKismetStringLibrary::Conv_VectorToString(CompLocation);
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+
+	PhysicsHandleComp->GrabComponentAtLocation(GrabbableComp, TEXT("None"), CompLocation);
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, CompLocationString);
+}*/
+
+//else if(IsValid(GrabbableComp))
+//{
+//	PhysicsHandleComp->ReleaseComponent();
+//	//GrabbableComp = nullptr;
+//	
+//	bIsGrabbing = !bIsGrabbing;
+//}
+
+
 
 ////////////////////// Portal Function /////////////////////////
 
-void ASinglePlayer::SpawnPortalAlongVector(FVector StartLocation, FVector Direction, bool PortalA)
-{
-	FHitResult HitResult;
-	FVector EndLocation = (Direction * MaxSpawnDistance) + StartLocation;
+//void ASinglePlayer::SpawnPortalAlongVector(FVector StartLocation, FVector Direction, bool PortalA)
+//{
+//	FHitResult HitResult;
+//	FVector EndLocation = (Direction * MaxSpawnDistance) + StartLocation;
+//
+//	FCollisionObjectQueryParams ObjectQueryParams(FCollisionObjectQueryParams::AllObjects);
+//	FCollisionQueryParams QueryParams;
+//
+//	QueryParams.AddIgnoredActor(this);
+//
+//	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel11);
+//	
+//	if (GetWorld()->LineTraceSingleByObjectType(HitResult, StartLocation, EndLocation, ObjectQueryParams, QueryParams))
+//	{
+//		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Spawn Activated"));
+//		UKismetSystemLibrary::DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, 5.f, 1.f);
+//		if (APortalWall* NewPortalWall = Cast<APortalWall>(HitResult.GetActor()))
+//		{
+//			FVector TraceLine = (HitResult.TraceStart - HitResult.TraceEnd);
+//			FVector TempPortalOrigin = HitResult.Location + TraceLine.Normalize(0.0001);
+//			NewPortalWall->TryAddPortal(TempPortalOrigin, PortalA);
+//		}
+//	}
+//}
 
-	FCollisionObjectQueryParams ObjectQueryParams(FCollisionObjectQueryParams::AllObjects);
-	FCollisionQueryParams QueryParams;
+//void ASinglePlayer::SpawnLeftBlue()
+//{
+//	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Blue Portal Spawn!"));
+//	UCameraComponent* Cam = FPSCAM;
+//	FVector StartLocation = Cam->GetComponentLocation();
+//	FVector Direction = Cam->GetForwardVector();
+//	SpawnPortalAlongVector(StartLocation, Direction, true);
+//}
 
-	QueryParams.AddIgnoredActor(this);
-
-	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel11);
-	
-	if (GetWorld()->LineTraceSingleByObjectType(HitResult, StartLocation, EndLocation, ObjectQueryParams, QueryParams))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Spawn Activated"));
-		UKismetSystemLibrary::DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, 5.f, 1.f);
-		/*if (APortalWall* NewPortalWall = Cast<APortalWall>(HitResult.GetActor()))
-		{
-			FVector TraceLine = (HitResult.TraceStart - HitResult.TraceEnd);
-			FVector TempPortalOrigin = HitResult.Location + TraceLine.Normalize(0.0001);
-			NewPortalWall->TryAddPortal(TempPortalOrigin, PortalA);
-		}*/
-	}
-}
-
-void ASinglePlayer::SpawnLeftBlue()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Blue Portal Spawn!"));
-	UCameraComponent* Cam = FPSCAM;
-	FVector StartLocation = Cam->GetComponentLocation();
-	FVector Direction = Cam->GetForwardVector();
-	SpawnPortalAlongVector(StartLocation, Direction, true);
-}
-
-void ASinglePlayer::SpawnRightOrange()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Orange, TEXT("Orange Portal Spawn!"));
-	UCameraComponent* Cam = FPSCAM;
-	FVector StartLocation = Cam->GetComponentLocation();
-	FVector Direction = Cam->GetForwardVector();
-	SpawnPortalAlongVector(StartLocation, Direction, false);
-}
+//void ASinglePlayer::SpawnRightOrange()
+//{
+//	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Orange, TEXT("Orange Portal Spawn!"));
+//	UCameraComponent* Cam = FPSCAM;
+//	FVector StartLocation = Cam->GetComponentLocation();
+//	FVector Direction = Cam->GetForwardVector();
+//	SpawnPortalAlongVector(StartLocation, Direction, false);
+//}

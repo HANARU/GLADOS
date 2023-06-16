@@ -55,6 +55,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MouseRightclickAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PauseMenuAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Components, meta = (AllowPrivateAccess = "true"))
 	class UPrimitiveComponent* GrabbableComp;
 
@@ -62,7 +65,7 @@ public:
 	class UPhysicsHandleComponent* PhysicsHandleComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics, meta = (AllowPrivateAccess = "true"))
-	bool bIsGrabbing;
+	bool bIsGrabbing = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input)
 	bool bIsCrouching;
@@ -71,6 +74,8 @@ public:
 	bool bDestroyedPortalComponent = false;
 
 	float MaxSpawnDistance = 10000.f;
+
+	FRotator Direction;
 
 	
 
@@ -87,6 +92,9 @@ protected:
 
 	void Crouching();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsPause = false;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
@@ -94,10 +102,10 @@ public:
 
 	virtual void PickupGunPure() override;
 
-	void SpawnPortalAlongVector(FVector StartLocation, FVector Direction, bool PortalA);
+	//void SpawnPortalAlongVector(FVector StartLocation, FVector Direction, bool PortalA);
 
-	void SpawnLeftBlue();
+	//void SpawnLeftBlue();
 
-	void SpawnRightOrange();
+	//void SpawnRightOrange();
 
 };
