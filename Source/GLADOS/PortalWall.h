@@ -29,9 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<AActor*> PortalsOnwall;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> NeedSpawnActor;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UMaterialInterface* Material_Wall;
 

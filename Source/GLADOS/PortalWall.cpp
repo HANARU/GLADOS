@@ -14,6 +14,8 @@ APortalWall::APortalWall()
 	WallMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WallMesh"));
 	WallMesh->SetupAttachment(DefaultSceneRoot);
 	WallMesh->SetWorldScale3D(FVector(1.0, Wall_Width / 100.f, Wall_Height / 100.f));
+	WallMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel11);
+	WallMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	Material_Wall = CreateDefaultSubobject<UMaterialInterface>("Material_Wall");
 

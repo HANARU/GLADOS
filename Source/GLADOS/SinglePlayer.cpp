@@ -188,20 +188,24 @@ void ASinglePlayer::SpawnPortalAlongVector(FVector StartLocation, FVector Direct
 {
 	FHitResult HitResult;
 	FVector EndLocation = (Direction * MaxSpawnDistance) + StartLocation;
-	FCollisionObjectQueryParams ObjectQueryParams;
+
+	FCollisionObjectQueryParams ObjectQueryParams(FCollisionObjectQueryParams::AllObjects);
 	FCollisionQueryParams QueryParams;
+
+	QueryParams.AddIgnoredActor(this);
+
+	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel11);
 	
-	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel12);
-	if (GetWorld()->LineTraceSingleByObjectType(HitResult, StartLocation, EndLocation, ObjectQueryParams))
+	if (GetWorld()->LineTraceSingleByObjectType(HitResult, StartLocation, EndLocation, ObjectQueryParams, QueryParams))
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Spawn Activated"));
 		UKismetSystemLibrary::DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, 5.f, 1.f);
-		if (APortalWall* NewPortalWall = Cast<APortalWall>(HitResult.GetActor()))
+		/*if (APortalWall* NewPortalWall = Cast<APortalWall>(HitResult.GetActor()))
 		{
 			FVector TraceLine = (HitResult.TraceStart - HitResult.TraceEnd);
 			FVector TempPortalOrigin = HitResult.Location + TraceLine.Normalize(0.0001);
 			NewPortalWall->TryAddPortal(TempPortalOrigin, PortalA);
-		}
+		}*/
 	}
 }
 
