@@ -92,6 +92,8 @@ protected:
 
 	void Crouching();
 
+	void PauseMenu();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsPause = false;
 

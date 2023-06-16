@@ -72,6 +72,9 @@ void ASinglePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &ASinglePlayer::Interaction);
 
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ASinglePlayer::Crouching);
+	EnhancedInputComponent->BindAction(PauseMenuAction, ETriggerEvent::Started, this, &ASinglePlayer::PauseMenu);
+
+
 
 	//EnhancedInputComponent->BindAction(MouseLeftclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnLeftBlue);
 	//EnhancedInputComponent->BindAction(MouseRightclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnRightOrange);
@@ -150,7 +153,7 @@ void ASinglePlayer::Interaction()
 	GrabbableComp = HitResult.GetComponent();
 	bool PhysicsCheck = GrabbableComp->IsAnySimulatingPhysics();
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_BoolToString(PhysicsCheck));
+	/*GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_BoolToString(PhysicsCheck));*/
 
 	if (bIsGrabbing == false && PhysicsCheck == true)
 	{
@@ -159,7 +162,7 @@ void ASinglePlayer::Interaction()
 		CompLocation = GrabbableComp->GetComponentLocation();
 		FString CompLocationString = UKismetStringLibrary::Conv_VectorToString(CompLocation);
 
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+		/*GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));*/
 
 		PhysicsHandleComp->GrabComponentAtLocation(GrabbableComp, TEXT("None"), CompLocation);
 		//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, CompLocationString);
@@ -174,13 +177,18 @@ void ASinglePlayer::Interaction()
 
 }
 
+void ASinglePlayer::PauseMenu()
+{
+	bIsPause = !bIsPause;
+}
+
 void ASinglePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	if (IsValid(GrabbableComp))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.002, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+		/*GEngine->AddOnScreenDebugMessage(-1, 0.002, FColor::Black, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));*/
 		PhysicsHandleComp->SetTargetLocationAndRotation(GrabPoint->GetComponentLocation(), Direction);
 	}
 
