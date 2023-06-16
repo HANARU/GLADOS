@@ -1,4 +1,5 @@
 #include "SinglePlayer.h"
+#include "PortalWall.h"
 #include "Engine/World.h"
 #include "PortalComponent.h"
 #include "EnhancedInputComponent.h"
@@ -7,7 +8,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ASinglePlayer::ASinglePlayer()
 {
@@ -35,8 +38,6 @@ ASinglePlayer::ASinglePlayer()
 	PlayerMesh->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	PhysicsHandleComp = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
-	//PortalComponent = CreateDefaultSubobject<UPortalComponent>(TEXT("PortalComponent"));
-
 }
 
 void ASinglePlayer::BeginPlay()
@@ -49,6 +50,7 @@ void ASinglePlayer::BeginPlay()
 		{
 			Subsystem->ClearAllMappings();
 			Subsystem->AddMappingContext(PlayerMappingContext, 0);
+			Subsystem->AddMappingContext(PortalGunMappingContext, 1);
 		}
 	}
 	
@@ -69,15 +71,16 @@ void ASinglePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &ASinglePlayer::Interaction);
 
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ASinglePlayer::Crouching);
+
+	EnhancedInputComponent->BindAction(MouseLeftclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnLeftBlue);
+	EnhancedInputComponent->BindAction(MouseRightclickAction, ETriggerEvent::Started, this, &ASinglePlayer::SpawnRightOrange);
+
 }
 
-void ASinglePlayer::PickupGunPure()
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Overlap from Player"));
-	bDestroyedPortalComponent = true;
-	FString BoolCheck = UKismetStringLibrary::Conv_BoolToString(bDestroyedPortalComponent);
-	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, BoolCheck);
-}
+
+////////////////////// Basic Movement /////////////////////////
+
 
 void ASinglePlayer::Move(const FInputActionValue& Value)
 {
@@ -101,6 +104,31 @@ void ASinglePlayer::Look(const FInputActionValue& Value)
 		AddControllerYawInput(-LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ASinglePlayer::Crouching()
+{
+	bIsCrouching = !(bIsCrouching);
+	FString BoolCheck = UKismetStringLibrary::Conv_BoolToString(bIsCrouching);
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, BoolCheck);
+	if (bIsCrouching)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 200.f;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	}
+}
+
+////////////////////// Interaction /////////////////////////
+
+void ASinglePlayer::PickupGunPure()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Overlap from Player"));
+	bDestroyedPortalComponent = true;
+	FString BoolCheck = UKismetStringLibrary::Conv_BoolToString(bDestroyedPortalComponent);
+	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, BoolCheck);
 }
 
 void ASinglePlayer::Interaction()
@@ -152,4 +180,45 @@ void ASinglePlayer::Tick(float DeltaTime)
 		PhysicsHandleComp->SetTargetLocationAndRotation(GrabPoint->GetComponentLocation(),GetControlRotation());
 	}
 
+}
+
+////////////////////// Portal Function /////////////////////////
+
+void ASinglePlayer::SpawnPortalAlongVector(FVector StartLocation, FVector Direction, bool PortalA)
+{
+	FHitResult HitResult;
+	FVector EndLocation = (Direction * MaxSpawnDistance) + StartLocation;
+	FCollisionObjectQueryParams ObjectQueryParams;
+	FCollisionQueryParams QueryParams;
+	
+	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel12);
+	if (GetWorld()->LineTraceSingleByObjectType(HitResult, StartLocation, EndLocation, ObjectQueryParams))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Spawn Activated"));
+		UKismetSystemLibrary::DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, 5.f, 1.f);
+		if (APortalWall* NewPortalWall = Cast<APortalWall>(HitResult.GetActor()))
+		{
+			FVector TraceLine = (HitResult.TraceStart - HitResult.TraceEnd);
+			FVector TempPortalOrigin = HitResult.Location + TraceLine.Normalize(0.0001);
+			NewPortalWall->TryAddPortal(TempPortalOrigin, PortalA);
+		}
+	}
+}
+
+void ASinglePlayer::SpawnLeftBlue()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, TEXT("Blue Portal Spawn!"));
+	UCameraComponent* Cam = FPSCAM;
+	FVector StartLocation = Cam->GetComponentLocation();
+	FVector Direction = Cam->GetForwardVector();
+	SpawnPortalAlongVector(StartLocation, Direction, true);
+}
+
+void ASinglePlayer::SpawnRightOrange()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Orange, TEXT("Orange Portal Spawn!"));
+	UCameraComponent* Cam = FPSCAM;
+	FVector StartLocation = Cam->GetComponentLocation();
+	FVector Direction = Cam->GetForwardVector();
+	SpawnPortalAlongVector(StartLocation, Direction, false);
 }

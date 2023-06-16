@@ -35,6 +35,7 @@ void APortalWall::Tick(float DeltaTime)
 
 float APortalWall::ClampPointToWall(float Point, float WallSize, float PortalRadius)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Clamp Activated"));
 	float Offset = FMath::Clamp(((WallSize / 2) - PortalRadius) - abs(Point), -999999999, 0);
 	if (Point < 0.f)
 	{
@@ -50,6 +51,7 @@ float APortalWall::ClampPointToWall(float Point, float WallSize, float PortalRad
 
 FVector2D APortalWall::ConstrainPortalToWall(float PortalY, float PortalZ)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Constrain Activated"));
 	float ClampedY = ClampPointToWall(PortalY, Wall_Width, PortalSizeY);
 	float ClampedZ = ClampPointToWall(PortalZ, Wall_Height, PortalSizeZ);
 	FVector2D PortalYZ = FVector2D(ClampedY, ClampedZ);
@@ -59,25 +61,28 @@ FVector2D APortalWall::ConstrainPortalToWall(float PortalY, float PortalZ)
 
 AActor* APortalWall::TryAddPortal(FVector PortalOrigin, bool PortalA)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("AddPortal Activated"));
 	FVector RelativePortalOrigin = UKismetMathLibrary::InverseTransformLocation(GetActorTransform(), PortalOrigin);
 	RelativePortalOrigin.Y = ConstrainPortalToWall(RelativePortalOrigin.Y, RelativePortalOrigin.Z).X;
 	RelativePortalOrigin.Z = ConstrainPortalToWall(RelativePortalOrigin.Y, RelativePortalOrigin.Z).Y;
 	RelativePortalOrigin = FVector(RelativePortalOrigin.X, RelativePortalOrigin.Y, RelativePortalOrigin.Z);
-
+	APortal* Portal = nullptr;
 	if (HasRoomforNewPortal(RelativePortalOrigin.Y, RelativePortalOrigin.Z) == true)
 	{
 		FVector SpawnLocation = UKismetMathLibrary::TransformLocation(GetActorTransform(), RelativePortalOrigin);
 		FRotator SpawnRotation = GetActorRotation();
 		
-
-		
+		Portal = GetWorld()->SpawnActor<APortal>(PortalFactory, SpawnLocation, SpawnRotation);
+		PortalsOnwall.Add(Portal);
+		//OnDestroyed(Portal);
 	}
 
-	return nullptr;
+	return Portal;
 }
 
 bool APortalWall::HasRoomforNewPortal(float NewPortalY, float NewPortalZ)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("HasPortal Activated"));
 	for (auto Actor : PortalsOnwall)
 	{
 		FVector Rect3D_1 = UKismetMathLibrary::InverseTransformLocation(GetActorTransform(), Actor->GetActorLocation());
@@ -98,8 +103,14 @@ bool APortalWall::HasRoomforNewPortal(float NewPortalY, float NewPortalZ)
 	return true;
 }
 
+void APortalWall::OnPortalDestroyed(APortal* DestroyPortal)
+{
+	PortalsOnwall.Remove(DestroyPortal);
+}
+
 bool APortalWall::RectToRectCollision(FVector2D Rect1Origin, FVector2D Rect1Extents, FVector2D Rect2Origin, FVector2D Rect2Extents)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, TEXT("Collision Activated"));
 	bool CollsionCheck;
 	if (Rect1Origin.X + Rect1Extents.X < Rect2Origin.X - Rect2Extents.X) { CollsionCheck = false; }
 
@@ -122,7 +133,7 @@ void APortalWall::SetConstructor()
 	}
 
 	ConstructorHelpers::FClassFinder<APortal> TempPortal(TEXT("/Script/Engine.Blueprint'/Game/2_BP/BP_Portal.BP_Portal_C'"));
-	if (TempPortal.Succeeded()) { Portal->StaticClass(); }
+	if (TempPortal.Succeeded()) { PortalFactory->StaticClass(); }
 
 	ConstructorHelpers::FObjectFinder<UMaterialInterface> M_Wall(TEXT("/Script/Engine.Material'/Game/3_Assets/PortalWall/M_PortalWall.M_PortalWall'"));
 	if(M_Wall.Succeeded()) { WallMesh->SetMaterial(0, Material_Wall); }

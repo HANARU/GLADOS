@@ -63,7 +63,7 @@ void UPortalComponent::SpawnLeftBlue()
 	UCameraComponent* Cam = Player->FPSCAM;
 	FVector StartLocation = Cam->GetComponentLocation();
 	FVector Direction = Cam->GetForwardVector();
-	Player->PortalComponent->SpawnPortalAlongVector(StartLocation, Direction, true);
+	//Player->PortalComponent->SpawnPortalAlongVector(StartLocation, Direction, true);
 }
 
 void UPortalComponent::SpawnRightOrange()
@@ -72,6 +72,6 @@ void UPortalComponent::SpawnRightOrange()
 	UCameraComponent* Cam = Player->FPSCAM;
 	FVector StartLocation = Cam->GetComponentLocation();
 	FVector Direction = Cam->GetForwardVector();
-	Player->PortalComponent->SpawnPortalAlongVector(StartLocation, Direction, false);
+	//Player->PortalComponent->SpawnPortalAlongVector(StartLocation, Direction, false);
 }
 

@@ -36,7 +36,7 @@ public:
 	UMaterialInterface* Material_Wall;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Blueprint")
-	TSubclassOf<class APortal> Portal;
+	TSubclassOf<class APortal> PortalFactory;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UMaterial* BaseMaterial;
@@ -61,6 +61,8 @@ public:
 	AActor* TryAddPortal(FVector PortalOrigin, bool PortalA);
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool HasRoomforNewPortal(float NewPortalY, float NewPortalZ);
+	UFUNCTION(BlueprintCallable)
+	void OnPortalDestroyed(APortal* DestroyPortal);
 
 	bool RectToRectCollision(FVector2D Rect1Origin, FVector2D Rect1Extents, FVector2D Rect2Origin, FVector2D Rect2Extents);
 

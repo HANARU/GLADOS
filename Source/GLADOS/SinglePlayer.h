@@ -32,6 +32,9 @@ public:
 	class UInputMappingContext* PlayerMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputMappingContext* PortalGunMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -46,6 +49,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* InteractionAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* MouseLeftclickAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* MouseRightclickAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Components, meta = (AllowPrivateAccess = "true"))
 	class UPrimitiveComponent* GrabbableComp;
 
@@ -55,11 +64,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics, meta = (AllowPrivateAccess = "true"))
 	bool bIsGrabbing;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Portal, meta = (AllowPrivateAccess = "true"))
-	class UPortalComponent* PortalComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input)
+	bool bIsCrouching;
 
 	bool bIsHit;
 	bool bDestroyedPortalComponent = false;
+
+	float MaxSpawnDistance = 10000.f;
+
+	
 
 	ASinglePlayer();
 
@@ -72,11 +85,19 @@ protected:
 
 	void Interaction();
 
+	void Crouching();
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void PickupGunPure() override;
+
+	void SpawnPortalAlongVector(FVector StartLocation, FVector Direction, bool PortalA);
+
+	void SpawnLeftBlue();
+
+	void SpawnRightOrange();
 
 };
