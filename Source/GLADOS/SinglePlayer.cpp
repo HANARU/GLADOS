@@ -50,7 +50,7 @@ void ASinglePlayer::BeginPlay()
 		{
 			Subsystem->ClearAllMappings();
 			Subsystem->AddMappingContext(PlayerMappingContext, 0);
-			Subsystem->AddMappingContext(PortalGunMappingContext, 1);
+			//Subsystem->AddMappingContext(PortalGunMappingContext, 1);
 		}
 	}
 	
