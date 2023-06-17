@@ -112,15 +112,20 @@ void ASinglePlayer::Look(const FInputActionValue& Value)
 void ASinglePlayer::Crouching()
 {
 	bIsCrouching = !(bIsCrouching);
-	FString BoolCheck = UKismetStringLibrary::Conv_BoolToString(bIsCrouching);
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, BoolCheck);
+
 	if (bIsCrouching)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 200.f;
+		FPSCAM->SetRelativeLocation(FVector(0,0,30));
+		GetMesh()->SetRelativeLocation(FVector(0, 0, -45));
+		GetCapsuleComponent()->SetCapsuleSize(30, 40);
 	}
 	else
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		FPSCAM->SetRelativeLocation(FVector(0, 0, 60));
+		GetMesh()->SetRelativeLocation(FVector(0, 0, -75));
+		GetCapsuleComponent()->SetCapsuleSize(30 ,80);
 	}
 }
 
