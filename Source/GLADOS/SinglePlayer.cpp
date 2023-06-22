@@ -156,9 +156,11 @@ void ASinglePlayer::Interaction()
 	//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 2.f);
 
 	GrabbableComp = HitResult.GetComponent();
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Magenta, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
+
 	bool PhysicsCheck = GrabbableComp->IsAnySimulatingPhysics();
 
-	/*GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_BoolToString(PhysicsCheck));*/
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, UKismetStringLibrary::Conv_BoolToString(PhysicsCheck));
 
 	if (bIsGrabbing == false && PhysicsCheck == true)
 	{
