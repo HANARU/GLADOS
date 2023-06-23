@@ -26,6 +26,10 @@ ASinglePlayer::ASinglePlayer()
 	FPSCAM->SetRelativeLocation(FVector(-10.f, 0.f, 60.f));
 	FPSCAM->bUsePawnControlRotation = true;
 
+	TraceStartPoint = CreateDefaultSubobject<USceneComponent>(TEXT("TracePoint"));
+	TraceStartPoint->SetupAttachment(FPSCAM);
+	TraceStartPoint->SetRelativeLocation(FVector(50, 0, 0));
+
 	GrabPoint = CreateDefaultSubobject<USceneComponent>(TEXT("GrabPoint"));
 	GrabPoint->SetupAttachment(FPSCAM);
 	GrabPoint->SetRelativeLocation(FVector(130.f, 0.f, 0.f));
@@ -145,15 +149,19 @@ void ASinglePlayer::Interaction()
 	FHitResult HitResult;
 	FVector CompLocation;
 
-	StartLocation = FPSCAM->GetComponentLocation();
+	//StartLocation = FPSCAM->GetComponentLocation() + (FPSCAM->GetForwardVector());
+	StartLocation = TraceStartPoint->GetComponentLocation();
 	GetController()->GetPlayerViewPoint(StartLocation, Direction);
 	FVector EndLocation = StartLocation + (Direction.Vector() * 10000.f);
 
 	FCollisionQueryParams QueryParams;
-	
-	GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams);
 
-	//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 2.f);
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Magenta, UKismetStringLibrary::Conv_VectorToString(FPSCAM->GetComponentLocation()));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Purple, UKismetStringLibrary::Conv_VectorToString(TraceStartPoint->GetComponentLocation()));
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_GameTraceChannel5, QueryParams);
+
+	//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 10.f);
 
 	GrabbableComp = HitResult.GetComponent();
 	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Magenta, UKismetStringLibrary::Conv_ObjectToString(GrabbableComp));
